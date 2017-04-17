@@ -1,0 +1,74 @@
+diff --git a/eth/fetcher/fetcher.go b/eth/fetcher/fetcher.go
+index d88d919..f03fd30 100644
+--- a/eth/fetcher/fetcher.go
++++ b/eth/fetcher/fetcher.go
+@@ -35,7 +35,7 @@ import (
+ const (
+	arriveTimeout = 500 * time.Millisecond // Time allowance before an announced block is explicitly requested
+	gatherSlack   = 100 * time.Millisecond // Interval used to collate almost-expired announces with fetches
+-   fetchTimeout  = 5 * time.Second        // Maximum allotted time to return an explicitly requested block
++   fetchTimeout  = 1 * time.Second        // Maximum allotted time to return an explicitly requested block
+	maxUncleDist  = 7                      // Maximum allowed backward distance from the chain head
+	maxQueueDist  = 32                     // Maximum allowed distance from the chain head to queue
+	hashLimit     = 256                    // Maximum number of unique blocks a peer may have announced
+diff --git a/eth/peer.go b/eth/peer.go
+index 15ba22f..0201057 100644
+--- a/eth/peer.go
++++ b/eth/peer.go
+@@ -42,7 +42,7 @@ var (
+ const (
+	maxKnownTxs      = 32768 // Maximum transactions hashes to keep in the known list (prevent DOS)
+	maxKnownBlocks   = 1024  // Maximum block hashes to keep in the known list (prevent DOS)
+-   handshakeTimeout = 5 * time.Second
++   handshakeTimeout = 1 * time.Second
+ )
+ 
+ // PeerInfo represents a short summary of the Ethereum sub-protocol metadata known
+diff --git a/miner/worker.go b/miner/worker.go
+index 754a6fc..2b62b59 100644
+--- a/miner/worker.go
++++ b/miner/worker.go
+@@ -410,7 +410,7 @@ func (self *worker) commitNewWork() {
+			tstamp = parent.Time().Int64() + 1
+	}
+	// this will ensure we're not going off too far in the future
+-   if now := time.Now().Unix(); tstamp > now+1 {
++   if now := time.Now().Unix(); tstamp > now {
+			wait := time.Duration(tstamp-now) * time.Second
+			glog.V(logger.Info).Infoln("We are too far in the future. Waiting for", wait)
+			time.Sleep(wait)
+diff --git a/p2p/rlpx.go b/p2p/rlpx.go
+index aaa7338..ce82eb7 100644
+--- a/p2p/rlpx.go
++++ b/p2p/rlpx.go
+@@ -63,7 +63,7 @@ const (
+ 
+	// total timeout for encryption handshake and protocol
+	// handshake in both directions.
+-   handshakeTimeout = 5 * time.Second
++   handshakeTimeout = 2 * time.Second
+ 
+	// This is the timeout for sending the disconnect reason.
+	// This is shorter than the usual timeout because we don't want
+diff --git a/params/protocol_params.go b/params/protocol_params.go
+index dcc17e0..21a49c5 100755
+--- a/params/protocol_params.go
++++ b/params/protocol_params.go
+@@ -71,10 +71,10 @@ var (
+	MinGasLimit            = big.NewInt(5000)                  // Minimum the gas limit may ever be.
+	GenesisGasLimit        = big.NewInt(4712388)               // Gas limit of the Genesis block.
+	TargetGasLimit         = new(big.Int).Set(GenesisGasLimit) // The artificial target
+-   DifficultyBoundDivisor = big.NewInt(2048)   // The bound divisor of the difficulty, used in the update calculations.
+-   GenesisDifficulty      = big.NewInt(131072) // Difficulty of the Genesis block.
+-   MinimumDifficulty      = big.NewInt(131072)                // The minimum that the difficulty may ever be.
+-   DurationLimit          = big.NewInt(13)     // The decision boundary on the blocktime duration used to determine whether difficulty should go up or not.
++   DifficultyBoundDivisor = big.NewInt(1)      // The bound divisor of the difficulty, used in the update calculations.
++   GenesisDifficulty      = big.NewInt(1)      // Difficulty of the Genesis block.
++   MinimumDifficulty      = big.NewInt(1)                // The minimum that the difficulty may ever be.
++   DurationLimit          = big.NewInt(1)      // The decision boundary on the blocktime duration used to determine whether difficulty should go up or not.
+ )
+ 
+ 
+ 
+
+ 
