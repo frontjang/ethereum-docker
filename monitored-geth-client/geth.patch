@@ -28,11 +28,11 @@ diff --git a/miner/worker.go b/miner/worker.go
 index 754a6fc..2b62b59 100644
 --- a/miner/worker.go
 +++ b/miner/worker.go
-@@ -410,7 +410,7 @@ func (self *worker) commitNewWork() {
+@@ -428,7 +428,7 @@ if parent.Time().Cmp(new(big.Int).SetInt64(tstamp)) >= 0 {
 			tstamp = parent.Time().Int64() + 1
 	}
 	// this will ensure we're not going off too far in the future
--   if now := time.Now().Unix(); tstamp > now+1 {
+-   if now := time.Now().Unix(); tstamp > now+4 {
 +   if now := time.Now().Unix(); tstamp > now {
 			wait := time.Duration(tstamp-now) * time.Second
 			glog.V(logger.Info).Infoln("We are too far in the future. Waiting for", wait)
@@ -54,21 +54,26 @@ diff --git a/params/protocol_params.go b/params/protocol_params.go
 index dcc17e0..21a49c5 100755
 --- a/params/protocol_params.go
 +++ b/params/protocol_params.go
-@@ -71,10 +71,10 @@ var (
-	MinGasLimit            = big.NewInt(5000)                  // Minimum the gas limit may ever be.
-	GenesisGasLimit        = big.NewInt(4712388)               // Gas limit of the Genesis block.
-	TargetGasLimit         = new(big.Int).Set(GenesisGasLimit) // The artificial target
+@@ -29,10 +29,10 @@ var (
+	TxGas                  = big.NewInt(21000)  // Per transaction not creating a contract. NOTE: Not payable on data of calls between transactions.
+	TxGasContractCreation  = big.NewInt(53000)  // Per transaction that creates a contract. NOTE: Not payable on data of calls between transactions.
+	TxDataZeroGas          = big.NewInt(4)      // Per byte of data attached to a transaction that equals zero. NOTE: Not payable on data of calls between transactions.
 -   DifficultyBoundDivisor = big.NewInt(2048)   // The bound divisor of the difficulty, used in the update calculations.
--   GenesisDifficulty      = big.NewInt(131072) // Difficulty of the Genesis block.
--   MinimumDifficulty      = big.NewInt(131072)                // The minimum that the difficulty may ever be.
--   DurationLimit          = big.NewInt(13)     // The decision boundary on the blocktime duration used to determine whether difficulty should go up or not.
 +   DifficultyBoundDivisor = big.NewInt(1)      // The bound divisor of the difficulty, used in the update calculations.
+	QuadCoeffDiv           = big.NewInt(512)    // Divisor for the quadratic particle of the memory cost equation.
+-   GenesisDifficulty      = big.NewInt(131072) // Difficulty of the Genesis block.
+-   DurationLimit          = big.NewInt(13)     // The decision boundary on the blocktime duration used to determine whether difficulty should go up or not.
 +   GenesisDifficulty      = big.NewInt(1)      // Difficulty of the Genesis block.
-+   MinimumDifficulty      = big.NewInt(1)                // The minimum that the difficulty may ever be.
 +   DurationLimit          = big.NewInt(1)      // The decision boundary on the blocktime duration used to determine whether difficulty should go up or not.
- )
- 
- 
- 
-
- 
+	SstoreSetGas           = big.NewInt(20000)  // Once per SLOAD operation.
+	LogDataGas             = big.NewInt(8)      // Per byte in a LOG* operation's data.
+	CallStipend            = big.NewInt(2300)   // Free gas given at beginning of call.
+@@ -57,7 +57,7 @@ var (
+    CreateDataGas        = big.NewInt(200)    //
+    Ripemd160Gas         = big.NewInt(600)    //
+    Ripemd160WordGas     = big.NewInt(120)    //
+-   MinimumDifficulty    = big.NewInt(131072) // The minimum that the difficulty may ever be.
++   MinimumDifficulty    = big.NewInt(1)      // The minimum that the difficulty may ever be.
+    CallCreateDepth      = big.NewInt(1024)   // Maximum depth of call/create stack.
+    ExpGas               = big.NewInt(10)     // Once per EXP instuction.
+    LogGas               = big.NewInt(375)    // Per LOG* operation.

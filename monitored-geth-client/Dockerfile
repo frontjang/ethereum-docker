@@ -1,14 +1,4 @@
-FROM alpine:3.5
-
-ADD geth.patch /root/geth.patch
-
-RUN \
-  apk add --update go git make gcc musl-dev linux-headers ca-certificates && \
-  git clone --depth 1 https://github.com/ethereum/go-ethereum && \
-  (cd go-ethereum && patch -l -p1 < /root/geth.patch && make geth) && \
-  cp go-ethereum/build/bin/geth /geth && \
-  apk del go git make gcc musl-dev linux-headers && \
-  rm -rf /go-ethereum && rm -rf /var/cache/apk/*
+FROM ethereum/client-go
 
 RUN apt-get update &&\
     apt-get install -y curl git-core &&\
@@ -22,11 +12,15 @@ RUN cd /root &&\
     npm install &&\
     npm install -g pm2
 
+ADD geth.patch /root/geth.patch
+RUN cd / && git clone --depth 1 --branch release/1.5 https://github.com/ethereum/go-ethereum && \
+	cd /go-ethereum && patch -p1 -l < /root/geth.patch
+
+RUN apt-get install -y --no-install-recommends golang git make gcc libc-dev ca-certificates && \
+	cd /go-ethereum && make geth && cp build/bin/geth /geth
+
 ADD start.sh /root/start.sh
 ADD app.json /root/eth-net-intelligence-api/app.json
 RUN chmod +x /root/start.sh
-
-EXPOSE 8545
-EXPOSE 30303
 
 ENTRYPOINT /root/start.sh
